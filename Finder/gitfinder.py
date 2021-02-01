@@ -15,35 +15,41 @@ from multiprocessing import Pool
 from urllib.request import urlopen
 from urllib.error import HTTPError, URLError
 import sys
+import requests
 import ssl
 import encodings.idna
 
 def findgitrepo(output_file, domains):
     domain = ".".join(encodings.idna.ToASCII(label).decode("ascii") for label in domains.strip().split("."))
 
+    # try:
+    #     # Try to download http://target.tld/.git/HEAD
+    #     with urlopen(''.join(['http://', domain, '/.git/HEAD']), context=ssl._create_unverified_context(), timeout=5) as response:
+    #         answer = response.read(200).decode('utf-8', 'ignore')
+
+    # except HTTPError:
+    #     return
+    # except URLError:
+    #     return
+    # except OSError:
+    #     return
+    # except ConnectionResetError:
+    #     return
+    # except ValueError:
+    #     return
+    # except (KeyboardInterrupt, SystemExit):
+    #     raise
     try:
-        # Try to download http://target.tld/.git/HEAD
-        with urlopen(''.join(['http://', domain, '/.git/HEAD']), context=ssl._create_unverified_context(), timeout=5) as response:
-            answer = response.read(200).decode('utf-8', 'ignore')
-
-    except HTTPError:
+        resp = requests.get(domain+"/.git/HEAD",verify=False,timeout=5,headers={"User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36"})
+    except:
         return
-    except URLError:
-        return
-    except OSError:
-        return
-    except ConnectionResetError:
-        return
-    except ValueError:
-        return
-    except (KeyboardInterrupt, SystemExit):
-        raise
-
     # Check if refs/heads is in the file
-    if 'refs/heads' not in answer:
+    # print(domain,resp.text)
+    if 'refs/heads' not in resp.text:
         return
 
     # Write match to output_file
+    # print(domain)
     with open(output_file, 'a') as file_handle:
         file_handle.write(''.join([domain, '\n']))
 
