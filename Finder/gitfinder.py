@@ -18,6 +18,8 @@ import sys
 import requests
 import ssl
 import encodings.idna
+
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 def findgitrepo(output_file, domains):
