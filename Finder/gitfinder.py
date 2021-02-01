@@ -18,6 +18,7 @@ import sys
 import requests
 import ssl
 import encodings.idna
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 def findgitrepo(output_file, domains):
     domain = ".".join(encodings.idna.ToASCII(label).decode("ascii") for label in domains.strip().split("."))
